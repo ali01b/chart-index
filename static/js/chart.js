@@ -32,6 +32,26 @@ function calculateMovingAverageSeriesData(candleData, maLength) {
 
   return maData;
 }
+function calculateMovingAverageSeriesData2(candleData, maLength) {
+  const baData = [];
+
+  for (let i = 0; i < candleData.length; i++) {
+    if (i < maLength) {
+      // Provide whitespace data points until the MA can be calculated
+      baData.push({ time: candleData[i].time });
+    } else {
+      // Calculate the moving average, slow but simple way
+      let sum = 0;
+      for (let j = 0; j < maLength; j++) {
+        sum += candleData[i - j].open;
+      }
+      const maValue = sum / maLength;
+      baData.push({ time: candleData[i].time, value: maValue });
+    }
+  }
+
+  return maData;
+}
 
 async function initMainChart(stockData) {
   const chartOptions = {
@@ -76,7 +96,7 @@ async function initMainChart(stockData) {
 
   candleSeries.setData(
     stockData.historical_data.map((x) => ({
-      time: x.time,
+      time: x.date,
       open: x.open,
       high: x.high,
       low: x.low,
@@ -86,7 +106,7 @@ async function initMainChart(stockData) {
 
   const maData = calculateMovingAverageSeriesData(
     stockData.historical_data.map((x) => ({
-      time: x.time,
+      time: x.date,
       open: x.open,
       high: x.high,
       low: x.low,
@@ -119,45 +139,45 @@ async function initMainChart(stockData) {
 
   volumeSeries.setData(
     stockData.historical_data.map((x) => ({
-      time: x.time,
-      value: x.open,
+      time: x.date,
+      value: x.volume,
     }))
   );
 
-  const supportLevels = stockData.levels.supports; // Destek seviyeleri dizisi
-  const resistanceLevels = stockData.levels.resistances; // Direnç seviyeleri dizisi
+  const supportLevels = stockData.supports; // Destek seviyeleri dizisi
+  const resistanceLevels = stockData.resistances;
 
-  // // Destek seviyelerini çizen döngü
-  // supportLevels.forEach((support) => {
-  //   const supportLine = chart.addLineSeries({
-  //     color: "red",
-  //     lineWidth: 1,
-  //     lineStyle: LightweightCharts.LineStyle.Dotted,
-  //   });
+  // Destek seviyelerini çizen döngü
+  supportLevels.forEach((support) => {
+    const supportLine = chart.addLineSeries({
+      color: "red",
+      lineWidth: 2,
+      lineStyle: LightweightCharts.LineStyle.LargeDashed,
+    });
 
-  //   supportLine.setData(
-  //     stockData.historical_data.map((x) => ({
-  //       time: x.time,
-  //       value: support, // Her bir destek seviyesi için veri
-  //     }))
-  //   );
-  // });
+    supportLine.setData(
+      stockData.historical_data.map((x) => ({
+        time: x.date,
+        value: support, // Her bir destek seviyesi için veri
+      }))
+    );
+  });
 
-  // // Direnç seviyelerini çizen döngü
-  // resistanceLevels.forEach((resistance) => {
-  //   const resistanceLine = chart.addLineSeries({
-  //     color: "green",
-  //     lineWidth: 1,
-  //     lineStyle: LightweightCharts.LineStyle.Dotted,
-  //   });
+  // Direnç seviyelerini çizen döngü
+  resistanceLevels.forEach((resistance) => {
+    const resistanceLine = chart.addLineSeries({
+      color: "green",
+      lineWidth: 2,
+      lineStyle: LightweightCharts.LineStyle.LargeDashed,
+    });
 
-  //   resistanceLine.setData(
-  //     stockData.historical_data.map((x) => ({
-  //       time: x.time,
-  //       value: resistance, // Her bir direnç seviyesi için veri
-  //     }))
-  //   );
-  // });
+    resistanceLine.setData(
+      stockData.historical_data.map((x) => ({
+        time: x.date,
+        value: resistance, // Her bir direnç seviyesi için veri
+      }))
+    );
+  });
 
   // const support = stockData.levels.supports;
   // const resistance = stockData.levels.resistances;
@@ -188,7 +208,7 @@ async function initMainChart(stockData) {
   //   }))
   // );
 
-  chart.timeScale().setVisibleLogicalRange({ from: 350, to: 500 });
+  chart.timeScale().setVisibleLogicalRange({ from: 1070, to: 1220 });
 }
 
 async function initRSIChart(stockData) {
@@ -226,8 +246,8 @@ async function initRSIChart(stockData) {
   });
 
   rsiSeries.setData(
-    stockData.rsi.map((x) => ({
-      time: x.time,
+    stockData.historical_data.map((x) => ({
+      time: x.date,
       value: x.rsi,
     }))
   );
@@ -238,8 +258,8 @@ async function initRSIChart(stockData) {
   });
 
   overboughtLine.setData(
-    stockData.rsi.map((x) => ({
-      time: x.time,
+    stockData.historical_data.map((x) => ({
+      time: x.date,
       value: 70,
     }))
   );
@@ -251,8 +271,8 @@ async function initRSIChart(stockData) {
   });
 
   oversoldLine.setData(
-    stockData.rsi.map((x) => ({
-      time: x.time,
+    stockData.historical_data.map((x) => ({
+      time: x.date,
       value: 30,
     }))
   );
@@ -265,8 +285,7 @@ async function main() {
   const urlParams = new URLSearchParams(queryString);
 
   const stockData = await fetchData(
-    "https://python-rest-api-5q3k.onrender.com/api/stock/" +
-      urlParams.get("ticker")
+    "https://python-rest-api-5q3k.onrender.com/stock/" + urlParams.get("ticker")
   );
 
   if (!stockData || stockData.error) {
