@@ -98,17 +98,6 @@ async function initMainChart(stockData) {
   const maSeries = chart.addLineSeries({ color: "#2962FF", lineWidth: 1 });
   maSeries.setData(maData);
 
-  // const baData = calculateMovingAverageSeriesData(
-  //   stockData.historical_data.map((x) => ({
-  //     time: x.time,
-  //     open: x.open,
-  //   })),
-  //   20
-  // );
-
-  // const baSeries = chart.addLineSeries({ color: "red", lineWidth: 1 });
-  // baSeries.setData(baData);
-
   const volumeSeries = chart.addHistogramSeries({
     color: "rgba(255, 179, 0, 0.41)",
     priceFormat: {
@@ -123,37 +112,10 @@ async function initMainChart(stockData) {
   });
   volumeSeries.priceScale().applyOptions({
     scaleMargins: {
-      top: 0.7, // highest point of the series will be 70% away from the top
+      top: 0.9, // highest point of the series will be 70% away from the top
       bottom: 0,
     },
   });
-
-  // const extraSeries = chart.addAreaSeries({
-  //   topColor: "rgba(243, 251, 0, 0.78)",
-  //   bottomColor: "rgba(245, 253, 0, 0.2)",
-  //   lineColor: "rgba(243, 251, 0, 0.59)",
-  //   lineWidth: 2,
-  // });
-  // extraSeries.priceScale().applyOptions({
-  //   scaleMargins: {
-  //     top: 0.1,
-  //     bottom: 0.4,
-  //   },
-  // });
-
-  // extraSeries.setData(
-  //   stockData.historical_data.map((x) => ({
-  //     time: x.time,
-  //     value: x.low,
-  //   }))
-  // );
-
-  // areaSeries.setData(
-  //   stockData.historical_data.map((x) => ({
-  //     time: x.time,
-  //     value: x.low,
-  //   }))
-  // );
 
   volumeSeries.setData(
     stockData.historical_data.map((x) => ({
@@ -165,37 +127,37 @@ async function initMainChart(stockData) {
   const supportLevels = stockData.levels.supports; // Destek seviyeleri dizisi
   const resistanceLevels = stockData.levels.resistances; // Direnç seviyeleri dizisi
 
-  // Destek seviyelerini çizen döngü
-  supportLevels.forEach((support) => {
-    const supportLine = chart.addLineSeries({
-      color: "red",
-      lineWidth: 1,
-      lineStyle: LightweightCharts.LineStyle.Dotted,
-    });
+  // // Destek seviyelerini çizen döngü
+  // supportLevels.forEach((support) => {
+  //   const supportLine = chart.addLineSeries({
+  //     color: "red",
+  //     lineWidth: 1,
+  //     lineStyle: LightweightCharts.LineStyle.Dotted,
+  //   });
 
-    supportLine.setData(
-      stockData.historical_data.map((x) => ({
-        time: x.time,
-        value: support, // Her bir destek seviyesi için veri
-      }))
-    );
-  });
+  //   supportLine.setData(
+  //     stockData.historical_data.map((x) => ({
+  //       time: x.time,
+  //       value: support, // Her bir destek seviyesi için veri
+  //     }))
+  //   );
+  // });
 
-  // Direnç seviyelerini çizen döngü
-  resistanceLevels.forEach((resistance) => {
-    const resistanceLine = chart.addLineSeries({
-      color: "green",
-      lineWidth: 1,
-      lineStyle: LightweightCharts.LineStyle.Dotted,
-    });
+  // // Direnç seviyelerini çizen döngü
+  // resistanceLevels.forEach((resistance) => {
+  //   const resistanceLine = chart.addLineSeries({
+  //     color: "green",
+  //     lineWidth: 1,
+  //     lineStyle: LightweightCharts.LineStyle.Dotted,
+  //   });
 
-    resistanceLine.setData(
-      stockData.historical_data.map((x) => ({
-        time: x.time,
-        value: resistance, // Her bir direnç seviyesi için veri
-      }))
-    );
-  });
+  //   resistanceLine.setData(
+  //     stockData.historical_data.map((x) => ({
+  //       time: x.time,
+  //       value: resistance, // Her bir direnç seviyesi için veri
+  //     }))
+  //   );
+  // });
 
   // const support = stockData.levels.supports;
   // const resistance = stockData.levels.resistances;
@@ -314,7 +276,7 @@ async function main() {
 
   const watermarkElement = document.getElementById("watermark");
   watermarkElement.textContent =
-    urlParams.get("ticker").replace(".IS", "") + " - BIST100";
+    urlParams.get("ticker").replace(".IS", "") + ", 4s";
 
   initMainChart(stockData);
   initRSIChart(stockData);

@@ -19,11 +19,14 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 5rem;
+    font-size: 9rem;
     color: rgba(255, 255, 255, 0.1);
     pointer-events: none;
     user-select: none;
-    text-transform: uppercase;
-    font-weight: bold;
+    font-weight: bolder;
     z-index: 10; /* Önde görünmesi için */
+  }
+
+  #tv-attr-logo {
+    display: none;
   }
