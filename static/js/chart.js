@@ -98,16 +98,16 @@ async function initMainChart(stockData) {
   const maSeries = chart.addLineSeries({ color: "#2962FF", lineWidth: 1 });
   maSeries.setData(maData);
 
-  const baData = calculateMovingAverageSeriesData(
-    stockData.historical_data.map((x) => ({
-      time: x.time,
-      open: x.open,
-    })),
-    20
-  );
+  // const baData = calculateMovingAverageSeriesData(
+  //   stockData.historical_data.map((x) => ({
+  //     time: x.time,
+  //     open: x.open,
+  //   })),
+  //   20
+  // );
 
-  const baSeries = chart.addLineSeries({ color: "red", lineWidth: 1 });
-  baSeries.setData(baData);
+  // const baSeries = chart.addLineSeries({ color: "red", lineWidth: 1 });
+  // baSeries.setData(baData);
 
   const volumeSeries = chart.addHistogramSeries({
     color: "rgba(255, 179, 0, 0.41)",
