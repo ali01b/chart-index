@@ -123,7 +123,7 @@ async function initMainChart(stockData) {
   });
   volumeSeries.priceScale().applyOptions({
     scaleMargins: {
-      top: 0.9, // highest point of the series will be 70% away from the top
+      top: 0.7, // highest point of the series will be 70% away from the top
       bottom: 0,
     },
   });
