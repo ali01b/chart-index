@@ -208,7 +208,7 @@ async function initMainChart(stockData) {
   //   }))
   // );
 
-  chart.timeScale().setVisibleLogicalRange({ from: 1070, to: 1220 });
+  chart.timeScale().setVisibleLogicalRange({ from: 1070, to: 1253 });
 }
 
 async function initRSIChart(stockData) {
