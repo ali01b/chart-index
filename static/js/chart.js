@@ -285,7 +285,7 @@ async function main() {
   const urlParams = new URLSearchParams(queryString);
 
   const stockData = await fetchData(
-    "https://chart-api-wrapper.vercel.app/stock/" +
+    "https://bist-wrapper-api.onrender.com/stock/" +
       urlParams.get("ticker") +
       ".IS"
   );
