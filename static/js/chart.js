@@ -1,5 +1,5 @@
 let chart;
-let rsiChart; // Chart global değişkeni
+let rsiChart;
 
 async function fetchData(url) {
   try {
@@ -12,41 +12,21 @@ async function fetchData(url) {
   }
 }
 
-function calculateMovingAverageSeriesData(candleData, maLength) {
+function calculateMovingAverageSeriesData(candleData, period) {
   const maData = [];
 
   for (let i = 0; i < candleData.length; i++) {
-    if (i < maLength) {
-      // Provide whitespace data points until the MA can be calculated
+    if (i < period - 1) {
       maData.push({ time: candleData[i].time });
     } else {
-      // Calculate the moving average, slow but simple way
       let sum = 0;
-      for (let j = 0; j < maLength; j++) {
+      for (let j = 0; j < period; j++) {
         sum += candleData[i - j].close;
       }
-      const maValue = sum / maLength;
-      maData.push({ time: candleData[i].time, value: maValue });
-    }
-  }
-
-  return maData;
-}
-function calculateMovingAverageSeriesData2(candleData, maLength) {
-  const baData = [];
-
-  for (let i = 0; i < candleData.length; i++) {
-    if (i < maLength) {
-      // Provide whitespace data points until the MA can be calculated
-      baData.push({ time: candleData[i].time });
-    } else {
-      // Calculate the moving average, slow but simple way
-      let sum = 0;
-      for (let j = 0; j < maLength; j++) {
-        sum += candleData[i - j].open;
-      }
-      const maValue = sum / maLength;
-      baData.push({ time: candleData[i].time, value: maValue });
+      maData.push({
+        time: candleData[i].time,
+        value: sum / period,
+      });
     }
   }
 
@@ -56,206 +36,259 @@ function calculateMovingAverageSeriesData2(candleData, maLength) {
 async function initMainChart(stockData) {
   const chartOptions = {
     layout: {
-      background: { color: "#000000" },
-      textColor: "#CCCCCC",
+      background: {
+        type: "gradient",
+        gradient: {
+          startColor: "#1a1d1f",
+          endColor: "#131722",
+        },
+      },
+      textColor: "#d1d4dc",
+      fontSize: 12,
+      fontFamily: "'Roboto', sans-serif",
     },
-    width: window.innerWidth,
-    height: window.innerHeight,
     grid: {
-      visible: false,
-      vertLines: { color: "#000000" },
-      horzLines: { color: "#000000" },
-    },
-    timeScale: {
-      timeVisible: true,
-      borderColor: "#555555",
-    },
-    priceScale: {
-      borderColor: "#555555",
+      vertLines: {
+        color: "rgba(42, 46, 57, 0.5)",
+        style: 1,
+        visible: true,
+      },
+      horzLines: {
+        color: "rgba(42, 46, 57, 0.5)",
+        style: 1,
+        visible: true,
+      },
     },
     crosshair: {
-      mode: 0, // CrosshairMode.Normal
+      mode: LightweightCharts.CrosshairMode.Normal,
+      vertLine: {
+        color: "rgba(224, 227, 235, 0.4)",
+        width: 1,
+        style: 0,
+        labelBackgroundColor: "#2962FF",
+      },
+      horzLine: {
+        color: "rgba(224, 227, 235, 0.4)",
+        width: 1,
+        style: 0,
+        labelBackgroundColor: "#2962FF",
+      },
+    },
+    timeScale: {
+      borderColor: "rgba(42, 46, 57, 0.5)",
+      timeVisible: true,
+      secondsVisible: false,
+      borderVisible: true,
+    },
+    rightPriceScale: {
+      borderColor: "rgba(42, 46, 57, 0.5)",
+      scaleMargins: {
+        top: 0.1,
+        bottom: 0.2,
+      },
     },
     width: document.getElementById("chart").clientWidth,
     height: document.getElementById("chart").clientHeight,
   };
 
-  chart = LightweightCharts.createChart(
+  let chart = LightweightCharts.createChart(
     document.getElementById("chart"),
     chartOptions
   );
 
+  // Mum serisi
   const candleSeries = chart.addCandlestickSeries({
-    upColor: "#089981",
-    downColor: "#f23645",
-    borderDownColor: "#f23645",
-    borderUpColor: "#089981",
-    wickDownColor: "#f23645",
-    wickUpColor: "#089981",
+    upColor: "#26a69a",
+    downColor: "#ef5350",
+    borderUpColor: "#26a69a",
+    borderDownColor: "#ef5350",
+    wickUpColor: "#26a69a",
+    wickDownColor: "#ef5350",
+    priceFormat: {
+      type: "price",
+      precision: 2,
+      minMove: 0.01,
+    },
   });
 
-  candleSeries.setData(
-    stockData.historical_data.map((x) => ({
-      time: x.date,
-      open: x.open,
-      high: x.high,
-      low: x.low,
-      close: x.close,
-    }))
-  );
-
-  const maData = calculateMovingAverageSeriesData(
-    stockData.historical_data.map((x) => ({
-      time: x.date,
-      open: x.open,
-      high: x.high,
-      low: x.low,
-      close: x.close,
-    })),
-    20
-  );
-
-  const maSeries = chart.addLineSeries({ color: "#2962FF", lineWidth: 1 });
-  maSeries.setData(maData);
-
+  // Volume serisi
   const volumeSeries = chart.addHistogramSeries({
-    color: "rgba(255, 179, 0, 0.41)",
     priceFormat: {
       type: "volume",
     },
     priceScaleId: "", // set as an overlay by setting a blank priceScaleId
     // set the positioning of the volume series
     scaleMargins: {
+      top: 0.6, // highest point of the series will be 70% away from the top
+      bottom: 0,
+    },
+  });
+
+  volumeSeries.priceScale().applyOptions({
+    scaleMargins: {
       top: 0.7, // highest point of the series will be 70% away from the top
       bottom: 0,
     },
   });
-  volumeSeries.priceScale().applyOptions({
-    scaleMargins: {
-      top: 0.9, // highest point of the series will be 70% away from the top
-      bottom: 0,
-    },
+
+  // MA serileri
+  const ma20Series = chart.addLineSeries({
+    color: "#2962FF",
+    lineWidth: 2,
+    title: "MA20",
   });
 
-  volumeSeries.setData(
-    stockData.historical_data.map((x) => ({
-      time: x.date,
-      value: x.volume,
-    }))
-  );
+  const ma50Series = chart.addLineSeries({
+    color: "#FF6B6B",
+    lineWidth: 2,
+    title: "MA50",
+  });
 
-  const supportLevels = stockData.supports; // Destek seviyeleri dizisi
-  const resistanceLevels = stockData.resistances;
+  // Veri hazırlama
+  const historicalData = stockData.historical_data.map((x) => ({
+    time: x.date,
+    open: x.open,
+    high: x.high,
+    low: x.low,
+    close: x.close,
+  }));
 
-  // Destek seviyelerini çizen döngü
-  supportLevels.forEach((support) => {
+  // Volume verilerini renklendirme
+  const volumeData = stockData.historical_data.map((x, index) => ({
+    time: x.date,
+    value: x.volume,
+    color:
+      x.close >= x.open ? "rgba(38, 166, 154, 0.5)" : "rgba(239, 83, 80, 0.5)",
+  }));
+
+  // MA verilerini hesaplama
+  const ma20Data = calculateMovingAverageSeriesData(historicalData, 20);
+  const ma50Data = calculateMovingAverageSeriesData(historicalData, 50);
+
+  // Destek ve direnç seviyeleri
+  stockData.supports.forEach((support) => {
     const supportLine = chart.addLineSeries({
-      color: "red",
+      color: "rgba(38, 166, 154, 0.6)",
       lineWidth: 2,
-      lineStyle: LightweightCharts.LineStyle.LargeDashed,
+      lineStyle: LightweightCharts.LineStyle.Dashed,
+      title: "Destek",
     });
 
     supportLine.setData(
-      stockData.historical_data.map((x) => ({
-        time: x.date,
-        value: support, // Her bir destek seviyesi için veri
+      historicalData.map((x) => ({
+        time: x.time,
+        value: support,
       }))
     );
   });
 
-  // Direnç seviyelerini çizen döngü
-  resistanceLevels.forEach((resistance) => {
+  stockData.resistances.forEach((resistance) => {
     const resistanceLine = chart.addLineSeries({
-      color: "green",
+      color: "rgba(239, 83, 80, 0.6)",
       lineWidth: 2,
-      lineStyle: LightweightCharts.LineStyle.LargeDashed,
+      lineStyle: LightweightCharts.LineStyle.Dashed,
+      title: "Direnç",
     });
 
     resistanceLine.setData(
-      stockData.historical_data.map((x) => ({
-        time: x.date,
-        value: resistance, // Her bir direnç seviyesi için veri
+      historicalData.map((x) => ({
+        time: x.time,
+        value: resistance,
       }))
     );
   });
 
-  // const support = stockData.levels.supports;
-  // const resistance = stockData.levels.resistances;
+  // Verileri set etme
+  candleSeries.setData(historicalData);
+  volumeSeries.setData(volumeData);
+  ma20Series.setData(ma20Data);
+  ma50Series.setData(ma50Data);
 
-  // const resistanceLine = chart.addLineSeries({
-  //   color: "green",
-  //   lineWidth: 1,
-  //   lineStyle: LightweightCharts.LineStyle.Dotted,
-  // });
-
-  // const supportLine = chart.addLineSeries({
-  //   color: "red",
-  //   lineWidth: 1,
-  //   lineStyle: LightweightCharts.LineStyle.Dotted,
-  // });
-
-  // supportLine.setData(
-  //   stockData.historical_data.map((x) => ({
-  //     time: x.time,
-  //     value: support,
-  //   }))
-  // );
-
-  // resistanceLine.setData(
-  //   stockData.historical_data.map((x) => ({
-  //     time: x.time,
-  //     value: resistance,
-  //   }))
-  // );
-
-  // chart.timeScale().setVisibleLogicalRange({ from: 1070, to: 1253 });
+  // Son 50 muma zoom
+  const lastNCandles = 150; // İstediğiniz sayıya ayarlayabilirsiniz
+  if (historicalData.length > lastNCandles) {
+    chart.timeScale().setVisibleLogicalRange({
+      from: historicalData.length - lastNCandles,
+      to: historicalData.length - 1,
+    });
+  } else {
+    chart.timeScale().fitContent();
+  }
+  chart.timeScale().applyOptions({ visible: false });
+  window.addEventListener("resize", () => {
+    chart.applyOptions({
+      width: document.getElementById("chart").clientWidth,
+    });
+  });
 }
 
 async function initRSIChart(stockData) {
   const rsiOptions = {
     layout: {
-      background: { color: "#000000" },
-      textColor: "#CCCCCC",
+      background: {
+        type: "gradient",
+        gradient: {
+          startColor: "#1a1d1f",
+          endColor: "#131722",
+        },
+      },
+      textColor: "#d1d4dc",
+      fontSize: 12,
+      fontFamily: "'Roboto', sans-serif",
     },
-    width: document.getElementById("chart").clientWidth,
-    height: document.getElementById("rsiChart").clientHeight,
     grid: {
-      visible: false,
-      vertLines: { color: "#000000" },
-      horzLines: { color: "#000000" },
+      vertLines: {
+        color: "rgba(42, 46, 57, 0.5)",
+      },
+      horzLines: {
+        color: "rgba(42, 46, 57, 0.5)",
+      },
     },
     timeScale: {
-      borderColor: "rgba(197, 203, 206, 0.8)",
+      borderColor: "rgba(42, 46, 57, 0.5)",
       timeVisible: true,
-      secondsVisible: false,
-      rightBarStaysOnScroll: true,
     },
-    priceScale: {
-      borderColor: "#555555",
+    rightPriceScale: {
+      borderColor: "rgba(42, 46, 57, 0.5)",
     },
+    width: document.getElementById("rsiChart").clientWidth,
+    height: document.getElementById("rsiChart").clientHeight,
   };
 
-  rsiChart = LightweightCharts.createChart(
+  let rsiChart = LightweightCharts.createChart(
     document.getElementById("rsiChart"),
     rsiOptions
   );
 
+  // RSI serisi
   const rsiSeries = rsiChart.addLineSeries({
-    color: "#4e3a79",
+    color: "#7C83FD",
     lineWidth: 2,
+    title: "RSI",
   });
 
+  // Aşırı alım/satım seviyeleri
+  const overboughtLine = rsiChart.addLineSeries({
+    color: "rgba(239, 83, 80, 0.6)",
+    lineWidth: 1,
+    lineStyle: LightweightCharts.LineStyle.Dotted,
+    title: "Aşırı Alım",
+  });
+
+  const oversoldLine = rsiChart.addLineSeries({
+    color: "rgba(38, 166, 154, 0.6)",
+    lineWidth: 1,
+    lineStyle: LightweightCharts.LineStyle.Dotted,
+    title: "Aşırı Satım",
+  });
+
+  // Verileri set etme
   rsiSeries.setData(
     stockData.historical_data.map((x) => ({
       time: x.date,
       value: x.rsi,
     }))
   );
-
-  // Opsiyonel: RSI için 70 ve 30 referans çizgileri ekle
-  const overboughtLine = rsiChart.addLineSeries({
-    color: "green",
-  });
 
   overboughtLine.setData(
     stockData.historical_data.map((x) => ({
@@ -264,12 +297,6 @@ async function initRSIChart(stockData) {
     }))
   );
 
-  const oversoldLine = rsiChart.addLineSeries({
-    color: "blue",
-    lineWidth: 1,
-    lineStyle: LightweightCharts.LineStyle.Dotted,
-  });
-
   oversoldLine.setData(
     stockData.historical_data.map((x) => ({
       time: x.date,
@@ -277,13 +304,18 @@ async function initRSIChart(stockData) {
     }))
   );
 
-  rsiChart.timeScale().applyOptions({ visible: false });
+  // Responsive davranış
+  window.addEventListener("resize", () => {
+    rsiChart.applyOptions({
+      width: document.getElementById("rsiChart").clientWidth,
+    });
+  });
+  rsiChart.timeScale().fitContent();
 }
 
 async function main() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
-
   const stockData = await fetchData(
     "https://bist-wrapper-api.onrender.com/stock/" +
       urlParams.get("ticker") +
@@ -299,8 +331,10 @@ async function main() {
   watermarkElement.textContent =
     urlParams.get("ticker").replace(".IS", "") + ", 4s";
 
-  initMainChart(stockData);
-  initRSIChart(stockData);
+  document.getElementById("watermark-hero").textContent = "@erolatasoy chart";
+
+  await initMainChart(stockData);
+  await initRSIChart(stockData);
 }
 
 main();

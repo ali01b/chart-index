@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000000; /* Koyu tema */
+  }
+  #chart {
+    width: 100vw;
+    height: 80vh;
+  }
+
+  #rsiChart {
+    width: 100vw;
+    height: 20vh;
+  }
+
+  .watermark {
+    position: absolute;
+    font-family: sans-serif;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 9rem;
+    color: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    user-select: none;
+    font-weight: bolder;
+    z-index: 10; /* Önde görünmesi için */
+  }
+
+  #tv-attr-logo {
+    display: none;
+  }

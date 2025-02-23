@@ -10,9 +10,14 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/chart')
+@app.route('/charts/erolatasoy')
+def render_chart():
+    return render_template("charts/erolatasoy-chart.html")
+
+
+@app.route('/charts/main')
 def chart():
-    return render_template("chart.html")
+    return render_template("charts/main.html")
 
 
 if __name__ == '__main__':

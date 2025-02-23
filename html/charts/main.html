@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gelişmiş Borsa Grafiği</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+    <link rel="stylesheet" href="/static/css/chart.css" />
+  </head>
+  <body>
+    <div class="chart-container">
+      <div id="chart">
+        <div id="watermark" class="watermark"></div>
+        <div id="watermark-hero" class="hero"></div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #26a69a"></div>
+            <span>MA20</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #ff6b6b"></div>
+            <span>MA50</span>
+          </div>
+          <div class="legend-item">
+            <div
+              class="legend-color"
+              style="background: rgba(38, 166, 154, 0.6)"
+            ></div>
+            <span>Destek</span>
+          </div>
+          <div class="legend-item">
+            <div
+              class="legend-color"
+              style="background: rgba(239, 83, 80, 0.6)"
+            ></div>
+            <span>Direnç</span>
+          </div>
+        </div>
+      </div>
+      <div id="rsiChart"></div>
+    </div>
+    <script src="/static/js/chart.js" type="text/javascript"></script>
+  </body>
+</html>
