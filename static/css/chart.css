@@ -36,8 +36,10 @@ body {
 
 .hero {
   position: absolute;
+  top: 40%;
+  left: 32%;
   color: rgba(255, 255, 255, 0.1);
-  font-size: 40px;
+  font-size: 80px;
   font-weight: bold;
   user-select: none;
   z-index: 10;

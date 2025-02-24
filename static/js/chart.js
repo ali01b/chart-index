@@ -271,14 +271,14 @@ async function initRSIChart(stockData) {
   const overboughtLine = rsiChart.addLineSeries({
     color: "rgba(239, 83, 80, 0.6)",
     lineWidth: 1,
-    lineStyle: LightweightCharts.LineStyle.Dotted,
+    lineStyle: LightweightCharts.LineStyle.Dashed,
     title: "Aşırı Alım",
   });
 
   const oversoldLine = rsiChart.addLineSeries({
     color: "rgba(38, 166, 154, 0.6)",
     lineWidth: 1,
-    lineStyle: LightweightCharts.LineStyle.Dotted,
+    lineStyle: LightweightCharts.LineStyle.Dashed,
     title: "Aşırı Satım",
   });
 
