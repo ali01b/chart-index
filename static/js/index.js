@@ -294,7 +294,7 @@ async function main() {
   const urlParams = new URLSearchParams(queryString);
 
   const stockData = await fetchData(
-    "https://bist-wrapper-api.onrender.com/stock/" +
+    "https://borsa-api.onrender.com/stock/" +
       urlParams.get("ticker") +
       ".IS"
   );
