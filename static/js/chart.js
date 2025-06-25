@@ -317,9 +317,8 @@ async function main() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const stockData = await fetchData(
-    "https://borsa-api.onrender.com/stock/" +
-      urlParams.get("ticker") +
-      ".IS"
+    "http://37.60.228.9:2121/stock/" +
+      urlParams.get("ticker")
   );
 
   if (!stockData || stockData.error) {
